@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RacingApp.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        x:Class="RacingApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Гонки — болид, механик, погрузчик"
+        Width="1920" Height="1080">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <DockPanel Margin="12">
+        <StackPanel DockPanel.Dock="Top" Spacing="10">
+            <TextBlock Text="Моделирование гонок" FontSize="22" FontWeight="SemiBold"/>
+            <TextBlock TextWrapping="Wrap"
+                       Text="События: износ шин (механик → боксы) и случайное столкновение с заданной вероятностью (погрузчик). Несколько болидов, движение по треку."/>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBox Width="200" Watermark="Имя болида" Text="{Binding NewBolideName}"/>
+                <Button Content="Добавить болид" Command="{Binding AddBolideCommand}"/>
+                <Button Content="Старт / Стоп" Command="{Binding ToggleSimulationCommand}"/>
+                <Button Content="Очистить лог" Command="{Binding ClearLogCommand}"/>
+            </StackPanel>
+
+            <TextBlock Text="{Binding SimulationStatus}" FontWeight="SemiBold"/>
+        </StackPanel>
+
+        <Grid ColumnDefinitions="2*,*" Margin="0,12,0,0">
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1"
+                    BorderBrush="#2C3E50" BorderThickness="2" CornerRadius="8" Padding="0"
+                    Margin="0,0,8,0" ClipToBounds="True"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Viewbox Stretch="Uniform" StretchDirection="Both">
+                    <Canvas Width="1230" Height="580" Background="#ECF0F1">
+                        <Rectangle Width="1230" Height="580" Fill="#DCE6EC"/>
+                        <ItemsControl x:CompileBindings="False" ItemsSource="{Binding Bolides}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas Width="1230" Height="580"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.Styles>
+                                <Style Selector="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding CanvasX}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding CanvasY}"/>
+                                </Style>
+                            </ItemsControl.Styles>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="vm:BolideViewModel">
+                                    <StackPanel Orientation="Vertical" Spacing="4">
+                                        <Border Width="52" Height="16" CornerRadius="3" BorderThickness="1"
+                                                BorderBrush="#5D6D7E" Background="Black"/>
+                                        <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Bold" MaxWidth="220"
+                                                   Foreground="Black"/>
+                                        <TextBlock Text="{Binding Status}" FontSize="12" Foreground="Black"
+                                                   TextWrapping="Wrap" MaxWidth="240"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Canvas>
+                </Viewbox>
+            </Border>
+
+            <Border Grid.Row="0" Grid.Column="1" BorderBrush="#BDC3C7" BorderThickness="1" CornerRadius="4" Padding="8">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Журнал событий" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <ListBox ItemsSource="{Binding EventLog}"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>
